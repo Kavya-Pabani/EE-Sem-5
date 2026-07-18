@@ -16,8 +16,7 @@
         .btn:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-1px); }
         .score-layout { text-align: center; padding: 20px 0; }
         .score-circle { width: 120px; height: 120px; background: #f0fdf4; border: 4px solid var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; font-size: 2rem; font-weight: 800; color: var(--success); }
-        .home-btn { display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 16px; transition: opacity 0.2s; }
-        .home-btn:hover { opacity: 0.9; }
+        .home-btn { display: inline-block; background: var(--primary); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 16px; }
     </style>
 </head>
 <body>
@@ -30,23 +29,53 @@
         </div>
         <div id="score-frame" class="score-layout" style="display: none;">
             <div class="score-circle" id="final-score">0/0</div>
-            <h3>Quiz Completed Successfully!</h3>
-            <p id="feedback" style="color:#64748b; margin-bottom: 24px;">Great effort practicing your engineering concepts.</p>
+            <h3>Quiz Completed!</h3>
+            <p id="feedback" style="color:#64748b; margin-bottom: 24px; font-weight:500;"></p>
             <a class="home-btn" href="index.html">Return to Dashboard</a>
         </div>
     </div>
 
-    <script src="data.js"></script>
+    <!-- Load all data source files natively -->
+    <script src="data-ps2.js"></script>
+    <script src="data-eds.js"></script>
+    <script src="data-mi.js"></script>
+    <script src="data-ret.js"></script>
+    <script src="data-cs.js"></script>
+
     <script>
+        const databaseMap = { "ps2": ps2Data, "eds": edsData, "mi": miData, "ret": retData, "cs": csData };
         const p = new URLSearchParams(window.location.search);
-        const data = quizDatabase[p.get('sub')]?.chapters[p.get('ch')]?.topics[p.get('top')];
         
-        if (!data || data.questions.length === 0) {
+        const selectedSubject = databaseMap[p.get('sub')];
+        const selectedTopic = selectedSubject?.chapters[p.get('ch')]?.topics[p.get('top')];
+        
+        if (!selectedTopic || !selectedTopic.quizText.trim()) {
             document.getElementById('title').innerText = "Empty Quiz Topic";
-            document.getElementById('game-frame').innerHTML = "<p>No questions have been dropped into this topic file yet.</p><a class='home-btn' href='index.html'>Go Back</a>";
+            document.getElementById('game-frame').innerHTML = "<p>No questions added here yet.</p><a class='home-btn' href='index.html'>Go Back</a>";
         } else {
-            document.getElementById('title').innerText = data.topicName;
-            initQuiz(data.questions);
+            document.getElementById('title').innerText = selectedTopic.topicName;
+            initQuiz(parseQuizText(selectedTopic.quizText));
+        }
+
+        function parseQuizText(text) {
+            const blocks = text.split(/Q:/).filter(b => b.trim());
+            return blocks.map(block => {
+                const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+                const q = lines[0];
+                const options = [];
+                let answerLetter = '';
+                
+                lines.forEach(line => {
+                    if (line.match(/^[A-D]\)/)) {
+                        options.push(line.replace(/^[A-D]\)/, '').trim());
+                    } else if (line.startsWith('Correct:')) {
+                        answerLetter = line.replace('Correct:', '').trim().toUpperCase();
+                    }
+                });
+                
+                const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+                return { q, options, answer: letterMap[answerLetter] ?? 0 };
+            });
         }
 
         function initQuiz(questions) {
@@ -59,6 +88,12 @@
                     document.getElementById('game-frame').style.display = 'none';
                     document.getElementById('score-frame').style.display = 'block';
                     document.getElementById('final-score').innerText = `${score}/${total}`;
+                    
+                    const pct = (score / total) * 100;
+                    let msg = "📚 Time to study and try this one again!";
+                    if (pct === 100) msg = "🔥 Absolute Genius! Perfect score!";
+                    else if (pct >= 70) msg = "👍 Great job! You are ready for the exams.";
+                    document.getElementById('feedback').innerText = msg;
                     return;
                 }
                 document.getElementById('qn').innerText = idx + 1;
