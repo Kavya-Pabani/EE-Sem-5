@@ -6,34 +6,26 @@
     <title>EE Semester 5 Quiz Hub</title>
     <style>
         :root { --bg: #f8fafc; --card: #ffffff; --primary: #2563eb; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
-        .container { max-width: 1100px; margin: 0 auto; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 40px 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 40px; }
         h1 { margin: 0; font-size: 2.5rem; color: #0f172a; font-weight: 800; letter-spacing: -0.025em; }
         header p { color: var(--text-light); margin-top: 8px; font-size: 1.1rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .card h2 { margin: 0 0 16px 0; font-size: 1.3rem; color: #1e3a8a; border-bottom: 2px solid var(--bg); padding-bottom: 12px; }
-        details { margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); overflow: hidden; }
-        summary { padding: 12px; font-weight: 600; cursor: pointer; color: #334155; user-select: none; }
-        details[open] summary { background: #eff6ff; color: var(--primary); border-bottom: 1px solid var(--border); }
-        ul { list-style: none; padding: 0; margin: 0; }
-        li { border-bottom: 1px solid var(--border); }
-        li:last-child { border-bottom: none; }
-        .quiz-link { display: block; padding: 12px; text-decoration: none; color: #475569; font-size: 0.95rem; font-weight: 500; transition: background 0.2s; }
-        .quiz-link:hover { background: #f1f5f9; color: var(--primary); }
+        .grid { display: flex; flex-direction: column; gap: 16px; }
+        .subject-btn { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; text-decoration: none; color: #1e3a8a; font-size: 1.2rem; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.2s; }
+        .subject-btn:hover { border-color: var(--primary); background: #eff6ff; transform: translateY(-1px); }
+        .arrow { color: var(--primary); font-size: 1.4rem; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>⚡ Electrical Engineering</h1>
-            <p>Semester 5 • Shared Study Quiz Portal</p>
+            <p>Semester 5 • Select a Subject to Begin</p>
         </header>
         <div class="grid" id="subjects-grid"></div>
     </div>
 
-    <!-- 1. Load your 5 distinct subject data files -->
     <script src="data-ps2.js"></script>
     <script src="data-eds.js"></script>
     <script src="data-mi.js"></script>
@@ -41,38 +33,15 @@
     <script src="data-cs.js"></script>
 
     <script>
-        // 2. Link files to target identifiers
-        const databaseMap = {
-            "ps2": ps2Data,
-            "eds": edsData,
-            "mi": miData,
-            "ret": retData,
-            "cs": csData
-        };
-
+        const databaseMap = { "ps2": ps2Data, "eds": edsData, "mi": miData, "ret": retData, "cs": csData };
         const grid = document.getElementById('subjects-grid');
         
         for (let key in databaseMap) {
-            const sub = databaseMap[key];
-            let cardHtml = `<div class="card"><h2>📚 ${sub.subjectName}</h2>`;
-            
-            if (!sub.chapters || sub.chapters.length === 0) {
-                cardHtml += `<p style="color:var(--text-light); font-size:0.9rem; font-style:italic;">No chapters added yet.</p>`;
-            } else {
-                sub.chapters.forEach((ch, chIdx) => {
-                    cardHtml += `<details><summary>${ch.chapterName}</summary><ul>`;
-                    ch.topics.forEach((top, topIdx) => {
-                        cardHtml += `<li>
-                            <a class="quiz-link" href="quiz.html?sub=${key}&ch=${chIdx}&top=${topIdx}">
-                                📝 ${top.topicName}
-                            </a>
-                        </li>`;
-                    });
-                    cardHtml += `</ul></details>`;
-                });
-            }
-            cardHtml += `</div>`;
-            grid.innerHTML += cardHtml;
+            grid.innerHTML += `
+                <a class="subject-btn" href="subject.html?sub=${key}">
+                    <span>📚 ${databaseMap[key].subjectName}</span>
+                    <span class="arrow">➔</span>
+                </a>`;
         }
     </script>
 </body>
