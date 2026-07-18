@@ -2,7 +2,7 @@ const ps2Data = {
   subjectName: "Power Systems II",
   chapters: [
     {
-      chapterName: "Chapter 1: Representation of Power System Components",
+      chapterName: "Chapter 1: Line Performance",
       topics: [
         {
           topicName: "Short Transmission Lines",
@@ -25,21 +25,4 @@ const ps2Data = {
       ]
     }
   ]
-}
-  ,
-    {
-      chapterName: "Chapter 2: Transmission Line Modeling and Performance",
-      topics: [
-        {
-          topicName: "Transients on a Transmission Line",
-          quizText: `
-            Q: What limits the short circuit current at the absolute instant of a fault?
-            A) Resistance
-            B) Subtransient Reactance
-            C) Transient Reactance
-            D) Synchronous Reactance
-            Correct: B
-          `
-        }
-      ]
-    };
+};
