@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapters & Topics</title>
+    <style>
+        :root { --bg: #f8fafc; --card: #ffffff; --primary: #2563eb; --text: #1e293b; --border: #e2e8f0; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; margin: 0; }
+        .container { max-width: 680px; margin: 0 auto; }
+        h1 { font-size: 2rem; color: #0f172a; margin-bottom: 8px; font-weight: 800; }
+        .back-btn { display: inline-block; text-decoration: none; color: var(--primary); font-weight: 600; margin-bottom: 24px; }
+        .chapter-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .chapter-title { font-size: 1.2rem; font-weight: 700; color: #1e3a8a; border-bottom: 2px solid var(--bg); padding-bottom: 8px; margin-top: 0; margin-bottom: 12px; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { border-bottom: 1px solid var(--border); }
+        li:last-child { border-bottom: none; }
+        .topic-link { display: block; padding: 12px; text-decoration: none; color: #475569; font-weight: 500; transition: background 0.2s; }
+        .topic-link:hover { background: #f1f5f9; color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="back-btn" href="index.html">⬅ Back to Subjects</a>
+        <h1 id="subject-title">Loading Chapters...</h1>
+        <div id="chapters-list"></div>
+    </div>
+
+    <script src="data-ps2.js"></script>
+    <script src="data-eds.js"></script>
+    <script src="data-mi.js"></script>
+    <script src="data-ret.js"></script>
+    <script src="data-cs.js"></script>
+
+    <script>
+        const databaseMap = { "ps2": ps2Data, "eds": edsData, "mi": miData, "ret": retData, "cs": csData };
+        const p = new URLSearchParams(window.location.search);
+        const subKey = p.get('sub');
+        const sub = databaseMap[subKey];
+
+        if (sub) {
+            document.getElementById('subject-title').innerText = "📚 " + sub.subjectName;
+            const listDiv = document.getElementById('chapters-list');
+            
+            if (!sub.chapters || sub.chapters.length === 0) {
+                listDiv.innerHTML = "<p style='color:#64748b; font-style:italic;'>No chapters uploaded for this subject yet.</p>";
+            } else {
+                sub.chapters.forEach((ch, chIdx) => {
+                    let chHtml = `<div class="chapter-box"><h3 class="chapter-title">${ch.chapterName}</h3><ul>`;
+                    ch.topics.forEach((top, topIdx) => {
+                        chHtml += `<li>
+                            <a class="topic-link" href="quiz.html?sub=${subKey}&ch=${chIdx}&top=${topIdx}">
+                                📝 ${top.topicName}
+                            </a>
+                        </li>`;
+                    });
+                    chHtml += `</ul></div>`;
+                    listDiv.innerHTML += chHtml;
+                });
+            }
+        }
+    </script>
+</body>
+</html>
